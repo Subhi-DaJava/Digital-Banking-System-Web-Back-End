@@ -8,7 +8,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("Saving_Account")
+//@DiscriminatorValue("Saving_Account")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class SavingAccount extends BankAccount{
     private double interestRate;
