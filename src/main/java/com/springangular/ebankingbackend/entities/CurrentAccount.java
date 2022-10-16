@@ -8,7 +8,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@DiscriminatorValue("Current_Account")
+//@DiscriminatorValue("Current_Account")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class CurrentAccount extends BankAccount{
     private double overDraft;
