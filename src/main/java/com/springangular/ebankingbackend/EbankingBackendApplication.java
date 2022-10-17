@@ -1,9 +1,6 @@
 package com.springangular.ebankingbackend;
 
-import com.springangular.ebankingbackend.entities.AccountOperation;
-import com.springangular.ebankingbackend.entities.CurrentAccount;
-import com.springangular.ebankingbackend.entities.Customer;
-import com.springangular.ebankingbackend.entities.SavingAccount;
+import com.springangular.ebankingbackend.entities.*;
 import com.springangular.ebankingbackend.enums.AccountStatus;
 import com.springangular.ebankingbackend.enums.OperationType;
 import com.springangular.ebankingbackend.enums.TransactionType;
@@ -27,6 +24,35 @@ public class EbankingBackendApplication {
 	}
 
 	@Bean
+	CommandLineRunner start(BankAccountRepository bankAccountRepository) {
+			return args -> {
+				BankAccount bankAccount = bankAccountRepository.findById("0cd3f6b5-be58-481a-8852-07656fb0bc78").orElse(null);
+
+				if (bankAccount instanceof CurrentAccount) {
+					System.out.println("Over Draft => " + ((CurrentAccount) bankAccount).getOverDraft());
+				} else if (bankAccount instanceof SavingAccount) {
+					System.out.println("Rate Interest => " + ((SavingAccount) bankAccount).getInterestRate());
+				} else {
+					throw new IllegalArgumentException("There is no the BankAccount with this id");
+				}
+
+				System.out.println("This Account infos: ");
+				System.out.println(bankAccount.getId());
+				System.out.println(bankAccount.getCreatedDate());
+				System.out.println(bankAccount.getBalance());
+				System.out.println(bankAccount.getStatus());
+				System.out.println(bankAccount.getCustomer().getName());
+				System.out.println(bankAccount.getClass().getSimpleName());
+
+				bankAccount.getAccountOperations().forEach(op -> {
+					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+					System.out.println(
+							op.getId() + "\t" + op.getOperationDate() + "\t" + op.getAmount() + "\t" + op.getOperationType() + "\t" + op.getTransactionType());
+
+				});
+			};
+		}
+	/*@Bean
 	CommandLineRunner start(CustomerRepository customerRepository,
 							BankAccountRepository bankAccountRepository,
 							AccountOperationRepository accountOperationRepository) {
@@ -67,11 +93,8 @@ public class EbankingBackendApplication {
 					accountOperation.setTransactionType(Math.random() > 0.8 ? TransactionType.CARD : (Math.random() > 0.5 ? TransactionType.CASH : TransactionType.TRANSFER));
 					accountOperation.setBankAccount(account);
 					accountOperationRepository.save(accountOperation);
-
-
 				}
 			});
 		};
-	}
-
+	}*/
 }
