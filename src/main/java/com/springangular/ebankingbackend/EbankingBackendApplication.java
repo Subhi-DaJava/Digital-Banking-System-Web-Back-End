@@ -29,7 +29,7 @@ public class EbankingBackendApplication {
 	}
 
 	// Test the Service layer
-	@Bean
+	/*@Bean
 	CommandLineRunner start (BankAccountService bankAccountService) {
 		return args -> {
 			Stream.of("Polat", "Ibrahim", "Gulqiz", "Aygul").forEach(name -> {
@@ -68,7 +68,7 @@ public class EbankingBackendApplication {
 			});
 		};
 
-	}
+	}*/
 // The test for a search of the bankAccount Current or Saving
 /*	@Bean
 	CommandLineRunner start(BankAccountRepository bankAccountRepository) {

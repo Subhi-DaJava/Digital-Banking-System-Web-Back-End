@@ -1,5 +1,6 @@
 package com.springangular.ebankingbackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.springangular.ebankingbackend.enums.AccountStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +22,8 @@ public abstract class BankAccount {
     private AccountStatus status;
     @ManyToOne
     private Customer customer;
-    @OneToMany (mappedBy = "bankAccount", fetch = FetchType.EAGER) // fetch = FetchType.LAZY par défaut, fetch = FetchType.EAGER, RÔLE_ par exemple
+    @OneToMany (mappedBy = "bankAccount") // fetch = FetchType.LAZY par défaut, fetch = FetchType.EAGER, RÔLE_ par exemple
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<AccountOperation> accountOperations;
 
 }
