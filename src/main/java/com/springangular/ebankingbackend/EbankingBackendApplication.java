@@ -1,5 +1,6 @@
 package com.springangular.ebankingbackend;
 
+import com.springangular.ebankingbackend.dtos.CustomerDTO;
 import com.springangular.ebankingbackend.entities.*;
 import com.springangular.ebankingbackend.enums.AccountStatus;
 import com.springangular.ebankingbackend.enums.OperationType;
@@ -27,6 +28,47 @@ public class EbankingBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EbankingBackendApplication.class, args);
 	}
+	// Sava the Customers and BankAccounts with DOTs
+	/*@Bean
+	CommandLineRunner start (BankAccountService bankAccountService) {
+		return args -> {
+			Stream.of("PolatDTO", "IbrahimDTO", "GulqizDTO", "AygulDTO").forEach(name -> {
+				CustomerDTO customerDTO = new CustomerDTO();
+				customerDTO.setName(name);
+				customerDTO.setEmail(name + "@gmail.com");
+				bankAccountService.saveCustomer(customerDTO);
+			});
+			// 4 tours au total
+			bankAccountService.listCustomer().forEach( customer -> {
+				try {
+					bankAccountService.saveCurrentBankAccount(Math.random() * 90000, 9000, customer.getId());
+					bankAccountService.saveSavingBankAccount(Math.random() * 85000, 3.2, customer.getId());
+
+					// 1er tour 10 accounts, 2ᵉ tour 12 accounts, 3ᵉ tour 14 accounts, 4ᵉ tour 16 accounts
+					List<BankAccount> bankAccountList = bankAccountService.listBankAccounts();
+					for (BankAccount bankAccount : bankAccountList) {
+						for (int i = 0; i < 3; i++) {
+							bankAccountService.credit(
+									bankAccount.getId(),
+									10000 + Math.random() * 120000,
+									"First Credit",
+									Math.random() > 0.8 ? TransactionType.CARD : (Math.random() > 0.5 ? TransactionType.CASH : TransactionType.CHECK));
+
+							bankAccountService.debit(
+									bankAccount.getId(),
+									1000 + Math.random() * 9000,
+									"First Debit",
+									Math.random() > 0.8 ? TransactionType.CARD : (Math.random() > 0.5 ? TransactionType.CASH : TransactionType.CHECK));
+
+						}
+					}
+				} catch (BalanceNotSufficientException | BankAccountNotFoundException | CustomerNotFoundException e) {
+					e.printStackTrace();
+				}
+			});
+		};
+
+	}*/
 
 	// Test the Service layer
 	/*@Bean

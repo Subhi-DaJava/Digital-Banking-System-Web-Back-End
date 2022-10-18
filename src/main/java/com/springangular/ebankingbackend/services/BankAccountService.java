@@ -1,5 +1,6 @@
 package com.springangular.ebankingbackend.services;
 
+import com.springangular.ebankingbackend.dtos.CustomerDTO;
 import com.springangular.ebankingbackend.entities.BankAccount;
 import com.springangular.ebankingbackend.entities.CurrentAccount;
 import com.springangular.ebankingbackend.entities.Customer;
@@ -13,11 +14,12 @@ import java.util.List;
 
 public interface BankAccountService {
 
-  Customer saveCustomer(Customer customer);
+  CustomerDTO saveCustomer(CustomerDTO customerDTO);
+
   CurrentAccount saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId) throws CustomerNotFoundException;
   SavingAccount saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException;
 
-  List<Customer> listCustomer();
+  List<CustomerDTO> listCustomer();
 
   BankAccount getBankAccount(String id) throws BankAccountNotFoundException;
 
@@ -26,4 +28,10 @@ public interface BankAccountService {
   void transfer(String accountIdSource, String accountIdDestination, double amount, String description) throws BankAccountNotFoundException, BalanceNotSufficientException;
 
   List<BankAccount> listBankAccounts();
+
+  CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException;
+
+  CustomerDTO updateCustomer(CustomerDTO customerDTO);
+
+  void deleteCustomer(Long customerId) throws CustomerNotFoundException;
 }

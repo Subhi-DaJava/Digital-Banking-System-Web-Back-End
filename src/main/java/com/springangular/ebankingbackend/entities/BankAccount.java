@@ -23,7 +23,7 @@ public abstract class BankAccount {
     @ManyToOne
     private Customer customer;
     @OneToMany (mappedBy = "bankAccount") // fetch = FetchType.LAZY par défaut, fetch = FetchType.EAGER, RÔLE_ par exemple
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY), crée DTO
     private List<AccountOperation> accountOperations;
 
 }

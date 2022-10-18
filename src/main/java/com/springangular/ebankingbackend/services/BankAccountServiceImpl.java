@@ -1,12 +1,13 @@
 package com.springangular.ebankingbackend.services;
 
+import com.springangular.ebankingbackend.dtos.CustomerDTO;
 import com.springangular.ebankingbackend.entities.*;
-import com.springangular.ebankingbackend.enums.AccountStatus;
 import com.springangular.ebankingbackend.enums.OperationType;
 import com.springangular.ebankingbackend.enums.TransactionType;
 import com.springangular.ebankingbackend.exceptions.BalanceNotSufficientException;
 import com.springangular.ebankingbackend.exceptions.BankAccountNotFoundException;
 import com.springangular.ebankingbackend.exceptions.CustomerNotFoundException;
+import com.springangular.ebankingbackend.mappers.BankAccountMapperImpl;
 import com.springangular.ebankingbackend.repositories.AccountOperationRepository;
 import com.springangular.ebankingbackend.repositories.BankAccountRepository;
 import com.springangular.ebankingbackend.repositories.CustomerRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -25,22 +27,26 @@ public class BankAccountServiceImpl implements BankAccountService{
     private BankAccountRepository bankAccountRepository;
     private CustomerRepository customerRepository;
     private AccountOperationRepository accountOperationRepository;
+    private BankAccountMapperImpl dtoMapper;
 
     // same as @AllArgsConstructor of Lombok
     public BankAccountServiceImpl(BankAccountRepository bankAccountRepository,
                                   CustomerRepository customerRepository,
-                                  AccountOperationRepository accountOperationRepository) {
+                                  AccountOperationRepository accountOperationRepository, BankAccountMapperImpl dtoMapper) {
         this.bankAccountRepository = bankAccountRepository;
         this.customerRepository = customerRepository;
         this.accountOperationRepository = accountOperationRepository;
+        this.dtoMapper = dtoMapper;
     }
     // same as @slf4j api write directly log.info("");
     private static final Logger LOGGER = LoggerFactory.getLogger(BankAccountServiceImpl.class); // (this.getClass.getName())
 
     @Override
-    public Customer saveCustomer(Customer customer) {
+    public CustomerDTO saveCustomer(CustomerDTO customerDTO) {
         LOGGER.info("Saving new Customer");
-        return customerRepository.save(customer);
+        Customer customer = dtoMapper.fromCustomerDTO(customerDTO);
+        Customer savedCustomer = customerRepository.save(customer);
+        return dtoMapper.fromCustomer(savedCustomer);
     }
 
     @Override
@@ -82,9 +88,11 @@ public class BankAccountServiceImpl implements BankAccountService{
 
 
     @Override
-    public List<Customer> listCustomer() {
-
-        return customerRepository.findAll();
+    public List<CustomerDTO> listCustomer() {
+        List<Customer> customers = customerRepository.findAll();
+        List<CustomerDTO> customerDTOS = customers.stream()
+                .map(customer -> dtoMapper.fromCustomer(customer)).collect(Collectors.toList());
+        return customerDTOS;
     }
 
     @Override
@@ -140,4 +148,24 @@ public class BankAccountServiceImpl implements BankAccountService{
     public List<BankAccount> listBankAccounts() {
         return bankAccountRepository.findAll();
     }
+    @Override
+    public CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with this id : " + customerId));
+        return dtoMapper.fromCustomer(customer);
+    }
+    @Override
+    public CustomerDTO updateCustomer(CustomerDTO customerDTO) {
+        LOGGER.info("Updating a Customer");
+        Customer customer = dtoMapper.fromCustomerDTO(customerDTO);
+        Customer savedCustomer = customerRepository.save(customer);
+        return dtoMapper.fromCustomer(savedCustomer);
+    }
+    @Override
+    public void deleteCustomer(Long customerId) throws CustomerNotFoundException {
+        customerRepository.findById(customerId).orElseThrow(
+                () -> new CustomerNotFoundException("Customer not found with this id: " + customerId));
+        customerRepository.deleteById(customerId);
+    }
+
 }
