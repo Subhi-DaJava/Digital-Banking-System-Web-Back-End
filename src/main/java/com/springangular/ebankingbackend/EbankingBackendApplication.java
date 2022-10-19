@@ -1,6 +1,9 @@
 package com.springangular.ebankingbackend;
 
+import com.springangular.ebankingbackend.dtos.BankAccountDTO;
+import com.springangular.ebankingbackend.dtos.CurrentBankAccountDTO;
 import com.springangular.ebankingbackend.dtos.CustomerDTO;
+import com.springangular.ebankingbackend.dtos.SavingBankAccountDTO;
 import com.springangular.ebankingbackend.entities.*;
 import com.springangular.ebankingbackend.enums.AccountStatus;
 import com.springangular.ebankingbackend.enums.OperationType;
@@ -28,7 +31,58 @@ public class EbankingBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EbankingBackendApplication.class, args);
 	}
-	// Sava the Customers and BankAccounts with DOTs
+
+		// Sava the Customers and BankAccounts with DOTs, update the insert
+	/*@Bean
+	CommandLineRunner start (BankAccountService bankAccountService) {
+		return args -> {
+			Stream.of("Polat", "Ibrahim", "Gulqiz", "Aygul").forEach(name -> {
+				CustomerDTO customerDTO = new CustomerDTO();
+				customerDTO.setName(name);
+				customerDTO.setEmail(name + "@gmail.com");
+				bankAccountService.saveCustomer(customerDTO);
+			});
+			// 4 tours au total
+			bankAccountService.listCustomer().forEach( customer -> {
+				try {
+					bankAccountService.saveCurrentBankAccount(Math.random() * 90000, 9000, customer.getId());
+					bankAccountService.saveSavingBankAccount(Math.random() * 85000, 3.2, customer.getId());
+				} catch (CustomerNotFoundException e) {
+					e.printStackTrace();
+				}
+			});
+
+			try {
+				List<BankAccountDTO> bankAccountList = bankAccountService.getListBankAccounts();
+				for (BankAccountDTO bankAccount : bankAccountList) {
+					for (int i = 0; i < 10; i++) {
+						String accountId;
+						if(bankAccount instanceof SavingBankAccountDTO) {
+							accountId = ((SavingBankAccountDTO) bankAccount).getId();
+						} else {
+							accountId = ((CurrentBankAccountDTO) bankAccount).getId();
+						}
+						bankAccountService.credit(
+								accountId,
+								10000 + Math.random() * 120000,
+								"First Credit",
+								Math.random() > 0.8 ? TransactionType.CARD : (Math.random() > 0.5 ? TransactionType.CASH : TransactionType.CHECK));
+
+						bankAccountService.debit(
+								accountId,
+								1000 + Math.random() * 9000,
+								"First Debit",
+								Math.random() > 0.8 ? TransactionType.CARD : (Math.random() > 0.5 ? TransactionType.CASH : TransactionType.CHECK));
+
+					}
+				}
+			} catch (BalanceNotSufficientException | BankAccountNotFoundException e) {
+				e.printStackTrace();
+			}
+		};
+	}*/
+
+	// Sava the Customers with CustomersDOTs
 	/*@Bean
 	CommandLineRunner start (BankAccountService bankAccountService) {
 		return args -> {
