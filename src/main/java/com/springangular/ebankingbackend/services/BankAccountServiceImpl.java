@@ -89,15 +89,24 @@ public class BankAccountServiceImpl implements BankAccountService{
         SavingAccount savingAccountSaved = bankAccountRepository.save(savingAccount);
         return dtoMapper.fromSavingBankAccount(savingAccountSaved);
     }
-    public CurrentAccount updateCurrentAccount(CurrentBankAccountDTO currentBankAccountDTO) {
 
-        return null;
+    @Override
+    public BankAccountDTO updateBankAccount(String accountId, AccountStatus accountStatus) throws BankAccountNotFoundException {
+
+        BankAccount bankAccount = getBankAccountById(accountId);
+
+        if(bankAccount instanceof CurrentAccount) {
+            CurrentAccount currentAccount = (CurrentAccount) bankAccount;
+                    currentAccount.setStatus(accountStatus);
+            CurrentAccount updatedCurrentAccount = bankAccountRepository.save(currentAccount);
+            return dtoMapper.fromCurrentBankAccount(updatedCurrentAccount);
+        } else {
+            SavingAccount savingAccount = (SavingAccount) bankAccount;
+            savingAccount.setStatus(accountStatus);
+            SavingAccount updatedSaveAccount = bankAccountRepository.save(savingAccount);
+            return dtoMapper.fromSavingBankAccount(updatedSaveAccount);
+        }
     }
-    public SavingAccount updateSavingAccount(SavingBankAccountDTO savingBankAccountDTO) {
-
-        return null;
-    }
-
 
     @Override
     public List<CustomerDTO> listCustomer() {
@@ -163,8 +172,8 @@ public class BankAccountServiceImpl implements BankAccountService{
 
     @Override
     public void transfer(String accountIdSource, String accountIdDestination, double amount, String description) throws BankAccountNotFoundException, BalanceNotSufficientException {
-        debit(accountIdDestination, amount, description, TransactionType.valueOf((TransactionType.TRANSFER + " to " + accountIdDestination)));
-        credit(accountIdDestination, amount, description, TransactionType.valueOf(TransactionType.TRANSFER + " from " + accountIdSource));
+        debit(accountIdDestination, amount, description, TransactionType.TRANSFER);
+        credit(accountIdDestination, amount, description, TransactionType.TRANSFER);
     }
 
     @Override

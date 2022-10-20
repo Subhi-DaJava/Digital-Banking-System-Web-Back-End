@@ -1,6 +1,7 @@
 package com.springangular.ebankingbackend.services;
 
 import com.springangular.ebankingbackend.dtos.*;
+import com.springangular.ebankingbackend.enums.AccountStatus;
 import com.springangular.ebankingbackend.enums.TransactionType;
 import com.springangular.ebankingbackend.exceptions.BalanceNotSufficientException;
 import com.springangular.ebankingbackend.exceptions.BankAccountNotFoundException;
@@ -14,6 +15,8 @@ public interface BankAccountService {
 
   CurrentBankAccountDTO saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId) throws CustomerNotFoundException;
   SavingBankAccountDTO saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException;
+
+  BankAccountDTO updateBankAccount(String accountId, AccountStatus accountStatus) throws BankAccountNotFoundException;
 
   List<CustomerDTO> listCustomer();
 

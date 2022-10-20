@@ -1,9 +1,11 @@
 package com.springangular.ebankingbackend.web;
 
-import com.springangular.ebankingbackend.dtos.AccountHistoryDTO;
-import com.springangular.ebankingbackend.dtos.AccountOperationDTO;
-import com.springangular.ebankingbackend.dtos.BankAccountDTO;
+import com.springangular.ebankingbackend.dtos.*;
+import com.springangular.ebankingbackend.enums.AccountStatus;
+import com.springangular.ebankingbackend.enums.TransactionType;
+import com.springangular.ebankingbackend.exceptions.BalanceNotSufficientException;
 import com.springangular.ebankingbackend.exceptions.BankAccountNotFoundException;
+import com.springangular.ebankingbackend.exceptions.CustomerNotFoundException;
 import com.springangular.ebankingbackend.services.BankAccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -45,13 +47,58 @@ public class BankAccountRestController {
        return bankAccountService.getAccountHistoryByPage(accountId, page, size);
     }
 
-    @PostMapping("/accounts")
-    public BankAccountDTO saveBankAccount(@RequestBody BankAccountDTO bankAccountDTO) {
-        return null;
+    @PostMapping("/customers/{customerId}/current-ccounts")
+    public CurrentBankAccountDTO saveCurrentBankAccount(
+            @RequestParam double initialBalance,
+            @RequestParam double overDraft,
+            @PathVariable Long customerId) throws CustomerNotFoundException {
+
+        return bankAccountService.saveCurrentBankAccount(initialBalance, overDraft, customerId);
+    }
+
+    @PostMapping("/customers/{customerId}/saving-accounts")
+    public SavingBankAccountDTO saveSavingBankAccount(
+            @RequestParam double initialBalance,
+            @RequestParam double interestRate,
+            @PathVariable Long customerId) throws CustomerNotFoundException {
+
+        return bankAccountService.saveSavingBankAccount(initialBalance, interestRate, customerId);
     }
 
     @PutMapping("/accounts/{accountId}")
-    public BankAccountDTO updateBankAccount(@PathVariable String accountId, @RequestBody BankAccountDTO bankAccountDTO) {
-        return null;
+    public BankAccountDTO updateBankAccount(@PathVariable String accountId, @RequestParam AccountStatus accountStatus) throws BankAccountNotFoundException {
+        log.info("Update a bank account return with the account type");
+        return bankAccountService.updateBankAccount(accountId, accountStatus);
     }
+    @PostMapping("/accounts/{accountId}/debits")
+    public void debit(
+            @PathVariable String accountId,
+            @RequestParam double amount,
+            @RequestParam String description,
+            @RequestParam TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        log.info("Debit is successful with this accountId: " + accountId);
+        bankAccountService.debit(accountId, amount, description, transactionType);
+    }
+
+    @PostMapping("/accounts/{accountId}/credits")
+    public void credit(
+            @PathVariable String accountId,
+            @RequestParam double amount,
+            @RequestParam String description,
+            @RequestParam TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        log.info("Credit is successful with this accountId: " + accountId);
+        bankAccountService.debit(accountId, amount, description, transactionType);
+    }
+
+    @PostMapping("accounts/{sourceId}/transfers")
+    public void transfer(
+            @PathVariable String sourceId,
+            @RequestParam String targetId,
+            @RequestParam double amount,
+            @RequestParam String description) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        log.info("Transfer is successful between theses bankAccounts sourceId: " + sourceId + " and targetId: " + targetId);
+        bankAccountService.transfer(sourceId, targetId, amount, description);
+    }
+
+
 }
