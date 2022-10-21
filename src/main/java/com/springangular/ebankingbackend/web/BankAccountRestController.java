@@ -70,7 +70,7 @@ public class BankAccountRestController {
         log.info("Update a bank account return with the account type");
         return bankAccountService.updateBankAccount(accountId, accountStatus);
     }
-    @PostMapping("/accounts/{accountId}/debits")
+/*    @PostMapping("/accounts/{accountId}/debits")
     public void debit(
             @PathVariable String accountId,
             @RequestParam double amount,
@@ -88,16 +88,17 @@ public class BankAccountRestController {
             @RequestParam TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
         log.info("Credit is successful with this accountId: " + accountId);
         bankAccountService.debit(accountId, amount, description, transactionType);
-    }
+    }*/
 
     @PostMapping("accounts/{sourceId}/transfers")
     public void transfer(
             @PathVariable String sourceId,
             @RequestParam String targetId,
             @RequestParam double amount,
-            @RequestParam String description) throws BankAccountNotFoundException, BalanceNotSufficientException {
+            @RequestParam String description,
+            @RequestParam TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
         log.info("Transfer is successful between theses bankAccounts sourceId: " + sourceId + " and targetId: " + targetId);
-        bankAccountService.transfer(sourceId, targetId, amount, description);
+        bankAccountService.transfer(sourceId, targetId, amount, description, transactionType);
     }
 
 
