@@ -18,6 +18,11 @@ public class CustomerRestController {
     public CustomerRestController(BankAccountService bankAccountService) {
         this.bankAccountService = bankAccountService;
     }
+    @GetMapping("/customers/search")
+    public List<CustomerDTO> searchCustomers(@RequestParam(name = "keyword", defaultValue = "") String keyword) {
+        log.info("Customers have been searched");
+        return bankAccountService.searchCustomers("%" + keyword + "%");
+    }
     @GetMapping("/customers")
     public List<CustomerDTO> customers() {
         log.info("Customers' list have been returned");
