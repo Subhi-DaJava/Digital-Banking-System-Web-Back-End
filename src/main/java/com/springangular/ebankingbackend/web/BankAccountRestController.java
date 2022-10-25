@@ -14,6 +14,8 @@ import java.util.List;
 
 @RestController
 @Slf4j
+//@CrossOrigin("*")
+@CrossOrigin("http://localhost:4200")
 public class BankAccountRestController {
     private BankAccountService bankAccountService;
 

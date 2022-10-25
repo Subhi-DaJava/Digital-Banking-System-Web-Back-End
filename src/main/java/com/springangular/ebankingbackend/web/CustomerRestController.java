@@ -1,7 +1,6 @@
 package com.springangular.ebankingbackend.web;
 
 import com.springangular.ebankingbackend.dtos.CustomerDTO;
-import com.springangular.ebankingbackend.entities.Customer;
 import com.springangular.ebankingbackend.exceptions.CustomerNotFoundException;
 import com.springangular.ebankingbackend.services.BankAccountService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +10,8 @@ import java.util.List;
 
 @RestController
 @Slf4j
+//@CrossOrigin("*") // accepter tous les domaines
+@CrossOrigin("http://localhost:4200")
 public class CustomerRestController {
     private BankAccountService bankAccountService;
 
