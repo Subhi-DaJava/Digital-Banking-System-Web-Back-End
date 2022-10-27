@@ -130,7 +130,8 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void debit(String accountId, double amount, String description, TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
+    public void debit(
+            String accountId, double amount, String description, TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
 
         BankAccount bankAccount = getBankAccountById(accountId);
 
@@ -152,7 +153,8 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void credit(String accountId, double amount, String description, TransactionType transactionType) throws BankAccountNotFoundException {
+    public void credit (
+            String accountId, double amount, String description, TransactionType transactionType) throws BankAccountNotFoundException {
 
         BankAccount bankAccount = getBankAccountById(accountId);
 
@@ -171,7 +173,8 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void transfer(String accountIdSource, String accountIdDestination, double amount, String description, TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
+    public void transfer (
+            String accountIdSource, String accountIdDestination, double amount, String description, TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
         debit(accountIdSource, amount, description, transactionType);
         credit(accountIdDestination, amount, description, transactionType);
     }
@@ -239,7 +242,7 @@ public class BankAccountServiceImpl implements BankAccountService{
         if(bankAccount == null) throw new BankAccountNotFoundException("BankAccount not found with this id: " +accountId);
         * */
 
-        Page<AccountOperation> accountOperations= accountOperationRepository.findByBankAccountId(accountId, PageRequest.of(page, size));
+        Page<AccountOperation> accountOperations= accountOperationRepository.findByBankAccountIdOrderByOperationDateDesc(accountId, PageRequest.of(page, size));
 
         AccountHistoryDTO accountHistoryDTO = new AccountHistoryDTO();
 

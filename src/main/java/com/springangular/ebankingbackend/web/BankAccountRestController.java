@@ -49,7 +49,7 @@ public class BankAccountRestController {
        return bankAccountService.getAccountHistoryByPage(accountId, page, size);
     }
 
-    @PostMapping("/customers/{customerId}/current-ccounts")
+    @PostMapping("/customers/{customerId}/current-accounts")
     public CurrentBankAccountDTO saveCurrentBankAccount(
             @RequestParam double initialBalance,
             @RequestParam double overDraft,
@@ -72,35 +72,38 @@ public class BankAccountRestController {
         log.info("Update a bank account return with the account type");
         return bankAccountService.updateBankAccount(accountId, accountStatus);
     }
-/*    @PostMapping("/accounts/{accountId}/debits")
-    public void debit(
-            @PathVariable String accountId,
-            @RequestParam double amount,
-            @RequestParam String description,
-            @RequestParam TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
-        log.info("Debit is successful with this accountId: " + accountId);
-        bankAccountService.debit(accountId, amount, description, transactionType);
+    @PostMapping("/accounts/debit")
+    public DebitDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        log.info("Debit is successful");
+        bankAccountService.debit(
+                debitDTO.getAccountId(),
+                debitDTO.getAmount(),
+                debitDTO.getDescription(),
+                debitDTO.getTransactionType());
+        return debitDTO;
     }
 
-    @PostMapping("/accounts/{accountId}/credits")
-    public void credit(
-            @PathVariable String accountId,
-            @RequestParam double amount,
-            @RequestParam String description,
-            @RequestParam TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
-        log.info("Credit is successful with this accountId: " + accountId);
-        bankAccountService.debit(accountId, amount, description, transactionType);
-    }*/
+    @PostMapping("/accounts/credit")
+    public CreditDTO credit(@RequestBody CreditDTO creditDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        log.info("Credit is successful");
+        bankAccountService.debit(
+                creditDTO.getAccountId(),
+                creditDTO.getAmount(),
+                creditDTO.getDescription(),
+                creditDTO.getTransactionType());
+        return creditDTO;
+    }
 
-    @PostMapping("accounts/{sourceId}/transfers")
-    public void transfer(
-            @PathVariable String sourceId,
-            @RequestParam String targetId,
-            @RequestParam double amount,
-            @RequestParam String description,
-            @RequestParam TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
-        log.info("Transfer is successful between theses bankAccounts sourceId: " + sourceId + " and targetId: " + targetId);
-        bankAccountService.transfer(sourceId, targetId, amount, description, transactionType);
+    @PostMapping("accounts/transfer")
+    public void transfer(@RequestBody TransferRequestDTO transferRequestDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        log.info("Transfer is successful between theses bankAccounts sourceId: "
+                + transferRequestDTO.getAccountSource() + " and targetId: " + transferRequestDTO.getAccountTarget());
+        bankAccountService.transfer(
+                transferRequestDTO.getAccountSource(),
+                transferRequestDTO.getAccountTarget(),
+                transferRequestDTO.getAmount(),
+                transferRequestDTO.getDescription(),
+                transferRequestDTO.getTransactionType());
     }
 
 
