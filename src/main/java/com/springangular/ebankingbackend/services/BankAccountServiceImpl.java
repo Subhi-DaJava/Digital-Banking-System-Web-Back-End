@@ -12,6 +12,7 @@ import com.springangular.ebankingbackend.mappers.BankAccountMapperImpl;
 import com.springangular.ebankingbackend.repositories.AccountOperationRepository;
 import com.springangular.ebankingbackend.repositories.BankAccountRepository;
 import com.springangular.ebankingbackend.repositories.CustomerRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Slf4j
 public class BankAccountServiceImpl implements BankAccountService{
     private BankAccountRepository bankAccountRepository;
     private CustomerRepository customerRepository;
@@ -73,7 +75,6 @@ public class BankAccountServiceImpl implements BankAccountService{
 
     @Override
     public SavingBankAccountDTO saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException {
-
         Customer customer = customerRepository.findById(customerId).orElse(null);
         if(customer == null) {
             throw new CustomerNotFoundException("Customer not found");
@@ -191,7 +192,7 @@ public class BankAccountServiceImpl implements BankAccountService{
                 return dtoMapper.fromCurrentBankAccount(currentAccount);
             }
         }).collect(Collectors.toList());
-
+        log.info("All Bank Accounts are loading successfully");
         return bankAccountDTOS;
     }
     @Override
@@ -233,6 +234,21 @@ public class BankAccountServiceImpl implements BankAccountService{
 
         return accountOperationDTOS;
     }
+    @Override
+    public List<BankAccountDTO> getBankAccountsByCustomerId(Long customerId) {
+        List<BankAccount> bankAccountList = bankAccountRepository.getBankAccountByCustomer_Id(customerId);
+        List<BankAccountDTO> bankAccountDTOS;
+
+        bankAccountDTOS = bankAccountList.stream().map(bankAccount -> {
+            if(bankAccount instanceof CurrentAccount) {
+               return dtoMapper.fromCurrentBankAccount((CurrentAccount) bankAccount);
+            } else {
+            return dtoMapper.fromSavingBankAccount((SavingAccount) bankAccount);
+            }
+        }).collect(Collectors.toList());
+
+        return bankAccountDTOS;
+    }
 
     @Override
     public AccountHistoryDTO getAccountHistoryByPage(String accountId, int page, int size) throws BankAccountNotFoundException {
@@ -268,6 +284,5 @@ public class BankAccountServiceImpl implements BankAccountService{
             dtoMapper.fromCustomer(customer)).collect(Collectors.toList());
         return customerDTOS;
     }
-
 
 }

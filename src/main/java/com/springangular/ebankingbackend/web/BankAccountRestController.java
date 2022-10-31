@@ -2,7 +2,6 @@ package com.springangular.ebankingbackend.web;
 
 import com.springangular.ebankingbackend.dtos.*;
 import com.springangular.ebankingbackend.enums.AccountStatus;
-import com.springangular.ebankingbackend.enums.TransactionType;
 import com.springangular.ebankingbackend.exceptions.BalanceNotSufficientException;
 import com.springangular.ebankingbackend.exceptions.BankAccountNotFoundException;
 import com.springangular.ebankingbackend.exceptions.CustomerNotFoundException;
@@ -14,8 +13,8 @@ import java.util.List;
 
 @RestController
 @Slf4j
-//@CrossOrigin("*")
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin("*")
+//@CrossOrigin("http://localhost:4200")
 public class BankAccountRestController {
     private BankAccountService bankAccountService;
 
@@ -54,7 +53,7 @@ public class BankAccountRestController {
             @RequestParam double initialBalance,
             @RequestParam double overDraft,
             @PathVariable Long customerId) throws CustomerNotFoundException {
-
+        log.info("A Current Account has been successfully");
         return bankAccountService.saveCurrentBankAccount(initialBalance, overDraft, customerId);
     }
 
@@ -63,6 +62,7 @@ public class BankAccountRestController {
             @RequestParam double initialBalance,
             @RequestParam double interestRate,
             @PathVariable Long customerId) throws CustomerNotFoundException {
+        log.info("A Saving Account has been successfully");
 
         return bankAccountService.saveSavingBankAccount(initialBalance, interestRate, customerId);
     }
@@ -94,7 +94,7 @@ public class BankAccountRestController {
         return creditDTO;
     }
 
-    @PostMapping("accounts/transfer")
+    @PostMapping("/accounts/transfer")
     public void transfer(@RequestBody TransferRequestDTO transferRequestDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
         log.info("Transfer is successful between theses bankAccounts sourceId: "
                 + transferRequestDTO.getAccountSource() + " and targetId: " + transferRequestDTO.getAccountTarget());
@@ -105,6 +105,10 @@ public class BankAccountRestController {
                 transferRequestDTO.getDescription(),
                 transferRequestDTO.getTransactionType());
     }
-
+    @GetMapping("/customers/{customerId}/accounts")
+    public List<BankAccountDTO> getBankAccountsByCustomerId(@PathVariable Long customerId) {
+        List<BankAccountDTO> bankAccountDTOS = bankAccountService.getBankAccountsByCustomerId(customerId);
+        return bankAccountDTOS;
+    }
 
 }

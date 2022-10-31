@@ -1,15 +1,11 @@
 package com.springangular.ebankingbackend.mappers;
 
 import com.springangular.ebankingbackend.dtos.*;
-import com.springangular.ebankingbackend.entities.AccountOperation;
-import com.springangular.ebankingbackend.entities.CurrentAccount;
-import com.springangular.ebankingbackend.entities.Customer;
-import com.springangular.ebankingbackend.entities.SavingAccount;
+import com.springangular.ebankingbackend.entities.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 // MapStruct également
 @Service
@@ -78,5 +74,4 @@ public class BankAccountMapperImpl {
 
         return accountOperationDTO;
     }
-
 }
