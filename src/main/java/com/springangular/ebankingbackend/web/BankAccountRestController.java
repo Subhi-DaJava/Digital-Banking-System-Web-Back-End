@@ -7,6 +7,7 @@ import com.springangular.ebankingbackend.exceptions.BankAccountNotFoundException
 import com.springangular.ebankingbackend.exceptions.CustomerNotFoundException;
 import com.springangular.ebankingbackend.services.BankAccountService;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,6 @@ import java.util.List;
 public class BankAccountRestController {
 
     private final BankAccountService bankAccountService;
-
     public BankAccountRestController(BankAccountService bankAccountService) {
         this.bankAccountService = bankAccountService;
     }
@@ -109,6 +109,7 @@ public class BankAccountRestController {
     @GetMapping("/customers/{customerId}/accounts")
     public List<BankAccountDTO> getBankAccountsByCustomerId(@PathVariable Long customerId) {
         List<BankAccountDTO> bankAccountDTOS = bankAccountService.getBankAccountsByCustomerId(customerId);
+        log.info("All accounts of the customer with customerId:{} have been successfully retrieved", customerId);
         return bankAccountDTOS;
     }
 
