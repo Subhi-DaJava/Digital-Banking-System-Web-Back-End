@@ -16,7 +16,8 @@ import java.util.List;
 @CrossOrigin("*")
 //@CrossOrigin("http://localhost:4200")
 public class BankAccountRestController {
-    private BankAccountService bankAccountService;
+
+    private final BankAccountService bankAccountService;
 
     public BankAccountRestController(BankAccountService bankAccountService) {
         this.bankAccountService = bankAccountService;
