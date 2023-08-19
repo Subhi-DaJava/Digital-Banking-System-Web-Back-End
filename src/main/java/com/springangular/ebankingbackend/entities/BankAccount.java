@@ -1,12 +1,10 @@
 package com.springangular.ebankingbackend.entities;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.springangular.ebankingbackend.enums.AccountStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.List;
 @Entity

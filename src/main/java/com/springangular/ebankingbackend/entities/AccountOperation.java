@@ -2,11 +2,11 @@ package com.springangular.ebankingbackend.entities;
 
 import com.springangular.ebankingbackend.enums.OperationType;
 import com.springangular.ebankingbackend.enums.TransactionType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.util.Date;
 @Entity
 @Data @NoArgsConstructor @AllArgsConstructor
