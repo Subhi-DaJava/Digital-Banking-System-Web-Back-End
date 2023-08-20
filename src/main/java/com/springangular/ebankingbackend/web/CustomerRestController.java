@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @Slf4j
 //@CrossOrigin("*") // accepter tous les domaines
-@CrossOrigin("http://localhost:4200")
+//@CrossOrigin("http://localhost:4200")
 public class CustomerRestController {
     private final BankAccountService bankAccountService;
 

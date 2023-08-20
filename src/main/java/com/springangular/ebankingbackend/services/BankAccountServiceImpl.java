@@ -7,6 +7,7 @@ import com.springangular.ebankingbackend.enums.OperationType;
 import com.springangular.ebankingbackend.enums.TransactionType;
 import com.springangular.ebankingbackend.exceptions.BalanceNotSufficientException;
 import com.springangular.ebankingbackend.exceptions.BankAccountNotFoundException;
+import com.springangular.ebankingbackend.exceptions.CustomerAssociatedToBankAccountsException;
 import com.springangular.ebankingbackend.exceptions.CustomerNotFoundException;
 import com.springangular.ebankingbackend.mappers.BankAccountMapperImpl;
 import com.springangular.ebankingbackend.repositories.AccountOperationRepository;
@@ -29,11 +30,11 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @Slf4j
-public class BankAccountServiceImpl implements BankAccountService{
-    private BankAccountRepository bankAccountRepository;
-    private CustomerRepository customerRepository;
-    private AccountOperationRepository accountOperationRepository;
-    private BankAccountMapperImpl dtoMapper;
+public class BankAccountServiceImpl implements BankAccountService {
+    private final BankAccountRepository bankAccountRepository;
+    private final CustomerRepository customerRepository;
+    private final AccountOperationRepository accountOperationRepository;
+    private final BankAccountMapperImpl dtoMapper;
 
     // same as @AllArgsConstructor of Lombok
     public BankAccountServiceImpl(BankAccountRepository bankAccountRepository,
@@ -44,6 +45,7 @@ public class BankAccountServiceImpl implements BankAccountService{
         this.accountOperationRepository = accountOperationRepository;
         this.dtoMapper = dtoMapper;
     }
+
     // same as @slf4j api write directly log.info("");
     private static final Logger LOGGER = LoggerFactory.getLogger(BankAccountServiceImpl.class); // (this.getClass.getName())
 
@@ -58,7 +60,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     @Override
     public CurrentBankAccountDTO saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId) throws CustomerNotFoundException {
         Customer customer = customerRepository.findById(customerId).orElse(null);
-        if(customer == null) {
+        if (customer == null) {
             throw new CustomerNotFoundException("Customer not found");
         }
         CurrentAccount currentAccount = new CurrentAccount();
@@ -76,7 +78,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     @Override
     public SavingBankAccountDTO saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException {
         Customer customer = customerRepository.findById(customerId).orElse(null);
-        if(customer == null) {
+        if (customer == null) {
             throw new CustomerNotFoundException("Customer not found");
         }
         SavingAccount savingAccount = new SavingAccount();
@@ -96,9 +98,10 @@ public class BankAccountServiceImpl implements BankAccountService{
 
         BankAccount bankAccount = getBankAccountById(accountId);
 
-        if(bankAccount instanceof CurrentAccount) {
-            CurrentAccount currentAccount = (CurrentAccount) bankAccount;
-                    currentAccount.setStatus(accountStatus);
+        if (bankAccount instanceof CurrentAccount currentAccount) { // code original if(bankAccount instanceof CurrentAccount), here Replace 'currentAccount' with pattern variable
+            // CurrentAccount currentAccount = (CurrentAccount) bankAccount;
+
+            currentAccount.setStatus(accountStatus);
             CurrentAccount updatedCurrentAccount = bankAccountRepository.save(currentAccount);
             return dtoMapper.fromCurrentBankAccount(updatedCurrentAccount);
         } else {
@@ -113,16 +116,17 @@ public class BankAccountServiceImpl implements BankAccountService{
     public List<CustomerDTO> listCustomer() {
         List<Customer> customers = customerRepository.findAll();
         List<CustomerDTO> customerDTOS = customers.stream()
-                .map(customer -> dtoMapper.fromCustomer(customer)).collect(Collectors.toList());
+                .map(dtoMapper::fromCustomer).collect(Collectors.toList()); //   .map(customer -> dtoMapper.fromCustomer(customer)).collect(Collectors.toList());
+        log.info("List of Customers have been successfully retrieved from BankAccountServiceImpl");
         return customerDTOS;
     }
 
     @Override
     public BankAccountDTO getBankAccount(String id) throws BankAccountNotFoundException {
         BankAccount bankAccount = bankAccountRepository.findById(id)
-                .orElseThrow(() -> new BankAccountNotFoundException("No Bank Account with this id: " + id ));
-        if(bankAccount instanceof SavingAccount) {
-            SavingAccount savingAccount = (SavingAccount) bankAccount;
+                .orElseThrow(() -> new BankAccountNotFoundException("No Bank Account with this id: " + id));
+        if (bankAccount instanceof SavingAccount savingAccount) {
+            // same here
             return dtoMapper.fromSavingBankAccount(savingAccount);
         } else {
             CurrentAccount currentAccount = (CurrentAccount) bankAccount;
@@ -136,7 +140,7 @@ public class BankAccountServiceImpl implements BankAccountService{
 
         BankAccount bankAccount = getBankAccountById(accountId);
 
-        if(bankAccount.getBalance() < amount) {
+        if (bankAccount.getBalance() < amount) {
             throw new BalanceNotSufficientException("Balance not sufficient");
         }
         AccountOperation debitAccountOperation = new AccountOperation();
@@ -154,7 +158,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void credit (
+    public void credit(
             String accountId, double amount, String description, TransactionType transactionType) throws BankAccountNotFoundException {
 
         BankAccount bankAccount = getBankAccountById(accountId);
@@ -174,7 +178,7 @@ public class BankAccountServiceImpl implements BankAccountService{
     }
 
     @Override
-    public void transfer (
+    public void transfer(
             String accountIdSource, String accountIdDestination, double amount, String description, TransactionType transactionType) throws BankAccountNotFoundException, BalanceNotSufficientException {
         debit(accountIdSource, amount, description, transactionType);
         credit(accountIdDestination, amount, description, transactionType);
@@ -184,9 +188,11 @@ public class BankAccountServiceImpl implements BankAccountService{
     public List<BankAccountDTO> getListBankAccounts() {
         List<BankAccount> bankAccountList = bankAccountRepository.findAll();
         List<BankAccountDTO> bankAccountDTOS = bankAccountList.stream().map(bankAccount -> {
-            if(bankAccount instanceof SavingAccount) {
-                SavingAccount savingAccount = (SavingAccount) bankAccount;
+            if (bankAccount instanceof SavingAccount savingAccount) { // code original if(bankAccount instanceof SavingAccount), here Replace 'savingAccount' with pattern variable
+
+                //SavingAccount savingAccount = (SavingAccount) bankAccount; // code original
                 return dtoMapper.fromSavingBankAccount(savingAccount);
+
             } else {
                 CurrentAccount currentAccount = (CurrentAccount) bankAccount;
                 return dtoMapper.fromCurrentBankAccount(currentAccount);
@@ -195,12 +201,14 @@ public class BankAccountServiceImpl implements BankAccountService{
         log.info("All Bank Accounts are loading successfully");
         return bankAccountDTOS;
     }
+
     @Override
     public CustomerDTO getCustomer(Long customerId) throws CustomerNotFoundException {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with this id : " + customerId));
         return dtoMapper.fromCustomer(customer);
     }
+
     @Override
     public CustomerDTO updateCustomer(CustomerDTO customerDTO) {
         LOGGER.info("Updating a Customer");
@@ -208,42 +216,53 @@ public class BankAccountServiceImpl implements BankAccountService{
         Customer savedCustomer = customerRepository.save(customer);
         return dtoMapper.fromCustomer(savedCustomer);
     }
+
     @Override
     public void deleteCustomer(Long customerId) throws CustomerNotFoundException {
         customerRepository.findById(customerId).orElseThrow(
                 () -> new CustomerNotFoundException("Customer not found with this id: " + customerId));
+
+        List<BankAccountDTO> bankAccountDTOList = getBankAccountsByCustomerId(customerId);
+        if (!bankAccountDTOList.isEmpty()) {
+            log.error("Customer with id:{} has the associated accounts, from BankAccountService.", customerId);
+            throw new CustomerAssociatedToBankAccountsException("Customer with id:{%d}, detains the bank accounts".formatted(customerId));
+        }
         customerRepository.deleteById(customerId);
     }
 
     private BankAccount getBankAccountById(String accountId) throws BankAccountNotFoundException {
         BankAccount bankAccount = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new BankAccountNotFoundException("No Bank Account with this id: " + accountId ));
+                .orElseThrow(() -> new BankAccountNotFoundException("No Bank Account with this id: " + accountId));
+        log.info("BankAccount with id:{} has been successfully retrieved.", accountId);
         return bankAccount;
     }
+
     @Override
     public List<AccountOperationDTO> getAccountHistoryByList(String accountId) {
         List<AccountOperation> accountOperations = accountOperationRepository.findByBankAccountId(accountId);
-        if(accountOperations == null ) {
+        if (accountOperations == null) {
             return null;
         }
-        if(accountOperations.isEmpty()) {
+        if (accountOperations.isEmpty()) {
             return new ArrayList<>();
         }
-       List<AccountOperationDTO> accountOperationDTOS = accountOperations.stream().map(operation ->
-            dtoMapper.fromAccountOperation(operation)).collect(Collectors.toList());
+        List<AccountOperationDTO> accountOperationDTOS = accountOperations.stream().map(dtoMapper::fromAccountOperation).collect(Collectors.toList()); // map(operation -> dtoMapper.fromAccountOperation(operation)).collect(Collectors.toList());
 
+        log.info("Account's Histories with accountId:{} have been successfully retrieved.", accountId);
         return accountOperationDTOS;
     }
+
     @Override
     public List<BankAccountDTO> getBankAccountsByCustomerId(Long customerId) {
         List<BankAccount> bankAccountList = bankAccountRepository.getBankAccountByCustomer_Id(customerId);
+
         List<BankAccountDTO> bankAccountDTOS;
 
         bankAccountDTOS = bankAccountList.stream().map(bankAccount -> {
-            if(bankAccount instanceof CurrentAccount) {
-               return dtoMapper.fromCurrentBankAccount((CurrentAccount) bankAccount);
+            if (bankAccount instanceof CurrentAccount) {
+                return dtoMapper.fromCurrentBankAccount((CurrentAccount) bankAccount);
             } else {
-            return dtoMapper.fromSavingBankAccount((SavingAccount) bankAccount);
+                return dtoMapper.fromSavingBankAccount((SavingAccount) bankAccount);
             }
         }).collect(Collectors.toList());
 
@@ -258,12 +277,13 @@ public class BankAccountServiceImpl implements BankAccountService{
         if(bankAccount == null) throw new BankAccountNotFoundException("BankAccount not found with this id: " +accountId);
         * */
 
-        Page<AccountOperation> accountOperations= accountOperationRepository.findByBankAccountIdOrderByOperationDateDesc(accountId, PageRequest.of(page, size));
+        Page<AccountOperation> accountOperations = accountOperationRepository.findByBankAccountIdOrderByOperationDateDesc(accountId, PageRequest.of(page, size));
 
         AccountHistoryDTO accountHistoryDTO = new AccountHistoryDTO();
 
         List<AccountOperationDTO> accountOperationDTOS =
-                accountOperations.getContent().stream().map(operation -> dtoMapper.fromAccountOperation(operation)).collect(Collectors.toList());
+                accountOperations.getContent().stream().map(dtoMapper::fromAccountOperation).collect(Collectors.toList());
+        // map(operation -> dtoMapper.fromAccountOperation(operation)).collect(Collectors.toList());
 
         accountHistoryDTO.setAccountOperationDTOList(accountOperationDTOS);
         accountHistoryDTO.setAccountId(bankAccount.getId());
@@ -280,8 +300,9 @@ public class BankAccountServiceImpl implements BankAccountService{
     public List<CustomerDTO> searchCustomers(String keyword) {
         List<Customer> customers = customerRepository.searchCustomer(keyword);
         List<CustomerDTO> customerDTOS =
-                customers.stream().map(customer ->
-            dtoMapper.fromCustomer(customer)).collect(Collectors.toList());
+                customers.stream().map(dtoMapper::fromCustomer).collect(Collectors.toList());
+        //  map(customer -> dtoMapper.fromCustomer(customer)).collect(Collectors.toList());
+        log.info("Customers have been retrieved from BankAccountServiceImpl");
         return customerDTOS;
     }
 

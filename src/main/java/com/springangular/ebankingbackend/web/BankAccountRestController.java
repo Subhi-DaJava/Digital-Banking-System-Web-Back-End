@@ -8,13 +8,14 @@ import com.springangular.ebankingbackend.exceptions.CustomerNotFoundException;
 import com.springangular.ebankingbackend.services.BankAccountService;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @Slf4j
-@CrossOrigin("*")
+//@CrossOrigin("*")
 //@CrossOrigin("http://localhost:4200")
 public class BankAccountRestController {
 
@@ -22,23 +23,23 @@ public class BankAccountRestController {
     public BankAccountRestController(BankAccountService bankAccountService) {
         this.bankAccountService = bankAccountService;
     }
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_USER')")
     @GetMapping("/accounts/{id}")
     public BankAccountDTO getBankAccount(@PathVariable String id) throws BankAccountNotFoundException {
         log.info("BankAccountDTO is returned");
         return bankAccountService.getBankAccount(id);
     }
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_USER')")
     @GetMapping("/accounts")
     public List<BankAccountDTO> getListBankAccounts() {
         return bankAccountService.getListBankAccounts();
     }
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_USER')")
     @GetMapping("/accounts/{accountId}/operations")
     public List<AccountOperationDTO> getHistoryByList(@PathVariable String accountId) {
         return bankAccountService.getAccountHistoryByList(accountId);
     }
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_USER')")
     @GetMapping("/accounts/{accountId}/pageOperations")
     public AccountHistoryDTO getAccountHistoryByPage(
             @PathVariable String accountId,
@@ -48,7 +49,7 @@ public class BankAccountRestController {
 
        return bankAccountService.getAccountHistoryByPage(accountId, page, size);
     }
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     @PostMapping("/customers/{customerId}/current-accounts")
     public CurrentBankAccountDTO saveCurrentBankAccount(
             @RequestParam double initialBalance,
@@ -57,7 +58,7 @@ public class BankAccountRestController {
         log.info("A Current Account has been successfully");
         return bankAccountService.saveCurrentBankAccount(initialBalance, overDraft, customerId);
     }
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     @PostMapping("/customers/{customerId}/saving-accounts")
     public SavingBankAccountDTO saveSavingBankAccount(
             @RequestParam double initialBalance,
@@ -67,34 +68,37 @@ public class BankAccountRestController {
 
         return bankAccountService.saveSavingBankAccount(initialBalance, interestRate, customerId);
     }
-
+@PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     @PutMapping("/accounts/{accountId}")
     public BankAccountDTO updateBankAccount(@PathVariable String accountId, @RequestParam AccountStatus accountStatus) throws BankAccountNotFoundException {
         log.info("Update a bank account return with the account type");
         return bankAccountService.updateBankAccount(accountId, accountStatus);
     }
+
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     @PostMapping("/accounts/debit")
     public DebitDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
-        log.info("Debit is successful");
         bankAccountService.debit(
                 debitDTO.getAccountId(),
                 debitDTO.getAmount(),
                 debitDTO.getDescription(),
                 debitDTO.getTransactionType());
+        log.info("Debit is successful");
         return debitDTO;
     }
-
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     @PostMapping("/accounts/credit")
     public CreditDTO credit(@RequestBody CreditDTO creditDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
-        log.info("Credit is successful");
-        bankAccountService.debit(
+        bankAccountService.credit(
                 creditDTO.getAccountId(),
                 creditDTO.getAmount(),
                 creditDTO.getDescription(),
                 creditDTO.getTransactionType());
+        log.info("Credit is successful");
         return creditDTO;
     }
 
+    @PreAuthorize("hasAnyAuthority('SCOPE_ADMIN')")
     @PostMapping("/accounts/transfer")
     public void transfer(@RequestBody TransferRequestDTO transferRequestDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
         log.info("Transfer is successful between theses bankAccounts sourceId: "
@@ -106,6 +110,7 @@ public class BankAccountRestController {
                 transferRequestDTO.getDescription(),
                 transferRequestDTO.getTransactionType());
     }
+    @PreAuthorize("hasAnyAuthority('SCOPE_USER')")
     @GetMapping("/customers/{customerId}/accounts")
     public List<BankAccountDTO> getBankAccountsByCustomerId(@PathVariable Long customerId) {
         List<BankAccountDTO> bankAccountDTOS = bankAccountService.getBankAccountsByCustomerId(customerId);

@@ -4,8 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class BalanceNotSufficientException extends RuntimeException {
-    public BalanceNotSufficientException(String message) {
+public class CustomerAssociatedToBankAccountsException extends RuntimeException {
+    public CustomerAssociatedToBankAccountsException(String message) {
         super(message);
     }
 }
